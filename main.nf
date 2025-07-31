@@ -1,57 +1,59 @@
 nextflow.enable.dsl=2
 
-// Start value for the chain
 params.start_num = 1
+params.out_dir = 'results'
 
-// Process 1: Increment number and pass to step 2
 process step1 {
   input:
     val n
   output:
-    val(result)
+    path "step1.txt"
   script:
-    result = n + 1
     """
-    echo $result
+    echo $n > step1.txt
     """
 }
 
-// Process 2: Increment again and pass on
 process step2 {
   input:
-    val n
+    path in_file
   output:
-    val(result)
+    path "step2.txt"
   script:
-    result = n + 1
     """
-    echo $result
+    prev=\$(tail -1 $in_file)
+    result=\$((prev + 1))
+    cat $in_file > step2.txt
+    echo \$result >> step2.txt
     """
 }
 
-// Process 3: Increment again
 process step3 {
   input:
-    val n
+    path in_file
   output:
-    val(result)
+    path "step3.txt"
   script:
-    result = n + 1
     """
-    echo $result
+    prev=\$(tail -1 $in_file)
+    result=\$((prev + 1))
+    cat $in_file > step3.txt
+    echo \$result >> step3.txt
     """
 }
 
-// Process 4: Final increment and print output
 process step4 {
   input:
-    val n
+    path in_file
   output:
-    stdout
+    path "final.txt"
+  publishDir params.out_dir, mode: 'copy'
   script:
-    result = n + 1
     """
-    echo $result
+    prev=\$(tail -1 $in_file)
+    result=\$((prev + 1))
+    cat $in_file > final.txt
+    echo \$result >> final.txt
     """
 }
 
@@ -62,5 +64,7 @@ workflow {
     | step2
     | step3
     | step4
-    | view
+
+  final_txt = step4.out
+  final_txt.view { "Final file created: $it" }
 }
