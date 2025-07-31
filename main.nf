@@ -26,7 +26,6 @@ process step2 {
     result = n + 1
     """
     echo $result
-    exit 1
     """
 }
 
