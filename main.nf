@@ -39,6 +39,7 @@ process step3 {
     result=\$((prev + 1))
     cat $in_file > step3.txt
     echo \$result >> step3.txt
+    exit 1
     """
 }
 
