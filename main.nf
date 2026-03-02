@@ -1,7 +1,6 @@
 nextflow.enable.dsl=2
 
 params.start_num = 1
-params.out_dir = 'results'
 
 process step1 {
   input:
@@ -47,7 +46,6 @@ process step4 {
     path in_file
   output:
     path "final.txt"
-  publishDir params.out_dir, mode: 'copy'
   script:
     """
     prev=\$(tail -1 $in_file)
